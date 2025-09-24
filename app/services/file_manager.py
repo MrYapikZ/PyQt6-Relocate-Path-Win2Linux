@@ -34,3 +34,7 @@ class FileManager:
             return None
         # Pick the max by our custom key; unversioned wins, else highest number wins
         return max(files, key=version_key)
+
+    @staticmethod
+    def combine_paths(*args: str) -> Path:
+        return Path(*args)
