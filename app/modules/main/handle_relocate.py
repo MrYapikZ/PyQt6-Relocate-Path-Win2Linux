@@ -52,6 +52,7 @@ class RelocateHandler(QWidget):
                 self.ui.listWidget_folderList.addItem(folder)
 
     def on_import_select(self):
+        self.ui.listWidget_available.clear()
         directory = self.ui.listWidget_folderList.selectedItems()
         if not directory:
             QMessageBox.warning(self, "Error", "Folder not selected")
