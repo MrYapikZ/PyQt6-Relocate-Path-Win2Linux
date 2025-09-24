@@ -1,5 +1,6 @@
 import os
 import re
+import tempfile
 from pathlib import Path
 from typing import List, Optional, Union
 from collections import defaultdict
@@ -12,8 +13,8 @@ class FileManager:
 
     @staticmethod
     def get_file_by_ext(directory: Union[str, Path], ext: str, latest: bool = False, recursive: bool = False, ) -> \
-    Union[
-        List[Path], Optional[Path]]:
+            Union[
+                List[Path], Optional[Path]]:
         directory = Path(directory)
         ext = ext.lower().lstrip(".")
         pattern = f"**/*.{ext}" if recursive else f"*.{ext}"
@@ -44,3 +45,14 @@ class FileManager:
     @staticmethod
     def combine_paths(*args: str) -> Path:
         return Path(*args)
+
+    @staticmethod
+    def convert_string2tempfile(script):
+        with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as tmp:
+            tmp.write(script)
+            tmp_path = tmp.name
+        return tmp_path
+
+    @staticmethod
+    def convert_module2string(script):
+        return script.decode("utf-8")

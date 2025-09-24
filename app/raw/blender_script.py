@@ -1,19 +1,19 @@
+from textwrap import dedent
+
+blender_script = dedent(
+    """
 import bpy
 import re
 import os
 
-# Set to True for preview mode (no actual changes)
-DRY_RUN = False
-
+bpy.ops.wm.open_mainfile(filepath="$FILEPATH")
 
 def relocate_lib(lib, new_path):
     abs_new = bpy.path.abspath(new_path)
     new_dir = os.path.dirname(abs_new)
     new_file = os.path.basename(abs_new)
 
-    print(f"Relocating:\n  {lib.filepath}\n  -> {abs_new}")
-    if DRY_RUN:
-        return
+    print(f"Relocating: {lib.filepath} -> {abs_new}")
 
     try:
         res = bpy.ops.library.relocate(
@@ -27,7 +27,6 @@ def relocate_lib(lib, new_path):
         lib.filepath = abs_new
 
 
-# ---- main ----
 changed = 0
 for lib in bpy.data.libraries:
     old_path = lib.filepath
@@ -38,10 +37,10 @@ for lib in bpy.data.libraries:
         continue
 
     drive = m.group(1).upper()
-    rest = m.group(2).replace("\\", "/")
+    rest = m.group(2).replace("'\\'", "/")
     new_path = f"/mnt/{drive}/{rest}"
 
-    if bpy.path.abspath(old_path).replace("\\", "/") == bpy.path.abspath(new_path).replace("\\", "/"):
+    if bpy.path.abspath(old_path).replace("'\\'", "/") == bpy.path.abspath(new_path).replace("'\\''", "/"):
         print(f"Already correct: {old_path}")
         continue
 
@@ -51,19 +50,7 @@ for lib in bpy.data.libraries:
 bpy.context.preferences.filepaths.use_relative_paths = True
 bpy.ops.file.make_paths_relative()
 
-reloaded = 0
-for lib in bpy.data.libraries:
-    try:
-        lib.reload()
-        print(f"Reloaded: {lib.filepath}")
-        reloaded += 1
-    except Exception as e:
-        print(f"Could not reload {lib.filepath}: {e}")
-
-print(f"Reloaded {reloaded} libraries.")
-
-if not DRY_RUN and changed:
-    #    bpy.ops.wm.save_mainfile()
-    print(f"Saved .blend. Updated libraries: {changed}")
-else:
-    print("No changes saved (dry run or nothing to update).")
+bpy.ops.wm.save_mainfile()
+print(f"Saved .blend. Updated libraries: {changed}")
+    """
+)

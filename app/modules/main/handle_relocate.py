@@ -1,6 +1,7 @@
 from PyQt6.QtCore import QVariant, Qt
 from PyQt6.QtWidgets import QWidget, QFileDialog, QMessageBox, QAbstractItemView, QListWidgetItem
 
+from app.services.execute_program import ExecuteProgram
 from app.ui.relocate_widget_ui import Ui_Form
 from app.services.file_manager import FileManager
 
@@ -14,6 +15,7 @@ class RelocateHandler(QWidget):
         self.root_path = None
         self._available_widget_order = []
 
+        self.ui.toolButton_blender.clicked.connect(self.on_select_file)
         self.ui.toolButton_rootPath.clicked.connect(self.on_select_folder)
         self.ui.pushButton_folderListImport.clicked.connect(self.on_import_select)
 
@@ -28,6 +30,7 @@ class RelocateHandler(QWidget):
 
         self.ui.pushButton_buttonScan.clicked.connect(self.on_scan_files)
         self.ui.pushButton_buttonClear.clicked.connect(self.on_clear)
+        self.ui.pushButton_buttonExecute.clicked.connect(self.on_execute)
 
         self._enable_drag_drop_lineedits()
         self._wire_search_available()
@@ -37,6 +40,11 @@ class RelocateHandler(QWidget):
         directory = QFileDialog.getExistingDirectory(self, "Select Directory")
         if directory:
             self.ui.lineEdit_rootPath.setText(directory)
+
+    def on_select_file(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Select Blender Program", "", "All Files (*)")
+        if file_path:
+            self.ui.lineEdit_blender.setText(file_path)
 
     def on_clear(self):
         self.ui.listWidget_selected.clear()
@@ -84,18 +92,42 @@ class RelocateHandler(QWidget):
     def on_move_available_item(self):
         sel = self.ui.listWidget_available.selectedItems()
         for item in sel:
-            self.ui.listWidget_selected.addItem(item.text())
             row = self.ui.listWidget_available.row(item)
-            self.ui.listWidget_available.takeItem(row)
+            item = self.ui.listWidget_available.takeItem(row)
+            self.ui.listWidget_selected.addItem(item)
 
     def on_move_selected_item(self):
         sel = self.ui.listWidget_selected.selectedItems()
         for item in sel:
-            text = item.text()
-            insert_row = self._find_insert_row_for_label(text)
-            self.ui.listWidget_available.insertItem(insert_row, text)
+            insert_row = self._find_insert_row_for_label(item.text())
             row = self.ui.listWidget_selected.row(item)
-            self.ui.listWidget_selected.takeItem(row)
+            item = self.ui.listWidget_selected.takeItem(row)
+            self.ui.listWidget_available.insertItem(insert_row, item)
+
+    def on_execute(self):
+        try:
+            if not self.ui.lineEdit_blender.text():
+                QMessageBox.warning(self, "Error", "Blender path not set")
+                return
+
+            for index in range(self.ui.listWidget_selected.count()):
+                item = self.ui.listWidget_selected.item(index)
+                print(item.text())
+                shot_file = item.data(Qt.ItemDataRole.UserRole)
+                print(shot_file)
+
+                execute_blender = ExecuteProgram().blender_execute(blender_path=self.ui.lineEdit_blender.text(),
+                                                                   file_path=shot_file)
+
+                if execute_blender:
+                    print(f"Blender process for {shot_file} completed successfully.")
+                else:
+                    print(f"Blender process for {shot_file} failed.")
+                    QMessageBox.critical(self, "Error", f"Failed to relocate path for: {shot_file}")
+
+            QMessageBox.information(self, "Success", "Successfully relocate path")
+        except:
+            QMessageBox.critical(self, "Error", "Failed to relocate path")
 
     def _enable_drag_drop_lineedits(self):
         def enable_dragdrop(le, exts=None):
@@ -129,6 +161,7 @@ class RelocateHandler(QWidget):
             le.dropEvent = dropEvent
 
         enable_dragdrop(getattr(self.ui, "lineEdit_rootPath", None), [])
+        enable_dragdrop(getattr(self.ui, "lineEdit_blender", None), [])
 
     def _available_order_index(self, label: str) -> int:
         try:

@@ -16,8 +16,15 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout_data">
-     <item row="0" column="0">
+     <item row="1" column="0">
       <layout class="QGridLayout" name="gridLayout_rootPath">
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="label_rootPath">
+         <property name="text">
+          <string>Root Path</string>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="1">
         <widget class="QToolButton" name="toolButton_rootPath">
          <property name="text">
@@ -28,16 +35,9 @@
        <item row="1" column="0">
         <widget class="QLineEdit" name="lineEdit_rootPath"/>
        </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QLabel" name="label_rootPath">
-         <property name="text">
-          <string>Root Path</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
-     <item row="1" column="0">
+     <item row="2" column="0">
       <layout class="QGridLayout" name="gridLayout_option">
        <item row="0" column="0">
         <widget class="QLabel" name="label_option">
@@ -65,14 +65,35 @@
        </item>
       </layout>
      </item>
-     <item row="0" column="1" rowspan="2">
+     <item row="0" column="0">
+      <layout class="QGridLayout" name="gridLayout_blender">
+       <item row="1" column="0">
+        <widget class="QLineEdit" name="lineEdit_blender"/>
+       </item>
+       <item row="1" column="1">
+        <widget class="QToolButton" name="toolButton_blender">
+         <property name="text">
+          <string>Locate</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="label_blender">
+         <property name="text">
+          <string>Blender</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="1" rowspan="3">
       <layout class="QGridLayout" name="gridLayout_folderList">
        <item row="0" column="0">
         <widget class="QListWidget" name="listWidget_folderList">
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>100</height>
+           <height>160</height>
           </size>
          </property>
         </widget>
