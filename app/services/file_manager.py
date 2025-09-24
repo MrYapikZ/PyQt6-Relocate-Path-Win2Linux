@@ -20,7 +20,7 @@ class FileManager:
         files = [p for p in directory.glob(pattern) if p.is_file()]
 
         if not latest:
-            return files
+            return sorted(files, key=lambda x: x.name)
 
         groups = defaultdict(list)
         for f in files:
@@ -39,7 +39,7 @@ class FileManager:
                 latest_file = max(items, key=lambda x: x[0])[1]
                 result.append(latest_file)
 
-        return result
+        return sorted(result, key=lambda x: x.name)
 
     @staticmethod
     def combine_paths(*args: str) -> Path:
