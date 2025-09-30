@@ -26,6 +26,8 @@ def relocate_lib(lib, new_path):
         print(f"  relocate op failed, falling back to direct filepath set: {e}")
         lib.filepath = abs_new
 
+for act in bpy.data.actions:
+    act.use_fake_user = True
 
 changed = 0
 for lib in bpy.data.libraries:
